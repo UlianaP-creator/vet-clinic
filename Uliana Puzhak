@@ -1,0 +1,93 @@
+package main.java.com.magicvet.service;
+
+import main.java.com.magicvet.model.Client;
+import main.java.com.magicvet.model.Pet;
+import main.java.com.magicvet.util.InputReader;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class VetClinicService {
+    private final List<Client> clients = new ArrayList<>();
+    private final InputReader inputReader = new InputReader();
+
+    public void start() {
+        System.out.println("Ласкаво просимо до MagicVet!");
+        while (true) {
+            System.out.println("\n1. Додати нового клієнта");
+            System.out.println("2. Додати домашнього улюбленця до клієнта");
+            System.out.println("3. Показати всіх клієнтів та їх улюбленців");
+            System.out.println("4. Вийти");
+            System.out.print("Оберіть опцію: ");
+            int choice = inputReader.readInt();
+            switch (choice) {
+                case 1:
+                    addNewClient();
+                    break;
+                case 2:
+                    addPetToClient();
+                    break;
+                case 3:
+                    showAllClientsAndPets();
+                    break;
+                case 4:
+                    System.out.println("Дякуємо за використання MagicVet. До побачення!");
+                    return;
+                default:
+                    System.out.println("Невірний вибір. Спробуйте ще раз.");
+            }
+        }
+    }
+
+    private void addNewClient() {
+        String email = inputReader.readEmail();
+        System.out.print("Введіть ім'я клієнта: ");
+        String name = inputReader.readString();
+        Client client = new Client(email, name);
+        clients.add(client);
+        System.out.println("Клієнта додано успішно.");
+    }
+
+    private void addPetToClient() {
+        if (clients.isEmpty()) {
+            System.out.println("Спочатку додайте клієнта.");
+            return;
+        }
+        System.out.print("Введіть email клієнта: ");
+        String email = inputReader.readString();
+        Client client = findClientByEmail(email);
+        if (client == null) {
+            System.out.println("Клієнта не знайдено.");
+            return;
+        }
+        System.out.print("Введіть ім'я улюбленця: ");
+        String petName = inputReader.readString();
+        System.out.print("Введіть тип улюбленця (CAT/DOG): ");
+        String petType = inputReader.readString().toUpperCase();
+        Pet pet = new Pet(petName, Pet.Type.valueOf(petType));
+        client.addPet(pet);
+        System.out.println("Улюбленця додано успішно.");
+    }
+
+    private void showAllClientsAndPets() {
+        if (clients.isEmpty()) {
+            System.out.println("Клієнтів немає.");
+            return;
+        }
+        for (Client client : clients) {
+            System.out.println(client);
+            for (Pet pet : client.getPets()) {
+                System.out.println("  - " + pet);
+            }
+        }
+    }
+
+    private Client findClientByEmail(String email) {
+        for (Client client : clients) {
+            if (client.getEmail().equals(email)) {
+                return client;
+            }
+        }
+        return null;
+    }
+}
